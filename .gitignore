@@ -25,3 +25,7 @@ huesilon-*.tar
 # Generated files
 usernames.txt
 usernames.sample.txt
+stuff/
+
+# Docker stuff
+docker-compose.yml

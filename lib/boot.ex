@@ -10,8 +10,6 @@ defmodule Boot do
 
         Bridges.set_bridges(validBridges)
 
-        HueWrapper.test_beep(validBridges)
-
         case validBridges do
             [] -> {:error, "No valid bridges found"}
             _ -> {:ok, validBridges}
