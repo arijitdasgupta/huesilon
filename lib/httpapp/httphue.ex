@@ -9,7 +9,7 @@ defmodule HttpHue do
         options
     end
 
-    get "/api/v1/lights/on" do
+    post "/api/v1/lights/on" do
         bridges = Bridges.get_bridges()
         Enum.each(bridges, fn(bridge) -> 
             HueWrapper.turn_on_lights(bridge)
@@ -18,7 +18,7 @@ defmodule HttpHue do
         send_resp(conn, 200, 'OK')
     end
 
-    get "/api/v1/lights/off" do
+    post "/api/v1/lights/off" do
         bridges = Bridges.get_bridges()
         Enum.each(bridges, fn(bridge) -> 
             HueWrapper.turn_off_lights(bridge)
