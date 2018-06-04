@@ -10,7 +10,7 @@ defmodule Bridges do
 
     def set_bridges(newBridges) do
         Logger.info "#{__MODULE__} Agent set to #{inspect(newBridges)}"
-        Agent.update(__MODULE__, fn(d) -> 
+        Agent.update(__MODULE__, fn(_) -> 
             %{bridges: newBridges}
         end)
     end

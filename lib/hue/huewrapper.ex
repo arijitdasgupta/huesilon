@@ -6,7 +6,7 @@ defmodule HueWrapper do
     end
 
     defp connect(ip) do
-        Huex.connect(ip) |> Huex.authorize("huesilon#kuch-bhi")
+        Huex.connect(ip) |> Huex.authorize("huesilon#application")
     end
 
     defp map_to_ok_err(bridge) do
@@ -37,19 +37,15 @@ defmodule HueWrapper do
     end
 
     defp operate_lights(bridge, funk) do
-        lights = Huex.lights(bridge)
-        Enum.each(lights, fn {k, _} -> 
-            {numb, _} = Integer.parse(k)
-            funk.(bridge, numb)
-        end)
+        funk.(bridge, 0)
     end
 
     def turn_on_lights(bridge) do
-        operate_lights(bridge, &Huex.turn_on/2)
+        operate_lights(bridge, &Huex.turn_group_on/2)
     end
 
     def turn_off_lights(bridge) do
-        operate_lights(bridge, &Huex.turn_off/2)
+        operate_lights(bridge, &Huex.turn_group_off/2)
     end
 
     def test_beep(bridges) do

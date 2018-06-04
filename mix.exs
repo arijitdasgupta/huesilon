@@ -23,7 +23,7 @@ defmodule Huesilon.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:huex, "~> 0.7"},
+      {:huex, git: "https://github.com/arijitdasgupta/huex.git", tag: "master"},
       {:nerves_ssdp_client, "~> 0.1"},
       {:cowboy, "~> 1.0"},
       {:plug, "~> 1.0"}
