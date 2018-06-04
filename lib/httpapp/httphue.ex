@@ -27,6 +27,7 @@ defmodule HttpHue do
         send_resp(conn, 200, 'OK')
     end
 
+    # POST body <brightness> 0 to 100
     post "/api/v1/lights/brightness" do
         {:ok, body, _} = read_body(conn)
 
@@ -48,6 +49,7 @@ defmodule HttpHue do
         send_resp(conn, 200, 'OK')
     end
 
+    # POST body <scene> 'Savannah Sunset'
     post "/api/v1/lights/scene" do
         {:ok, body, _} = read_body(conn)
 
