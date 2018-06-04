@@ -26,4 +26,36 @@ defmodule HttpHue do
 
         send_resp(conn, 200, 'OK')
     end
+
+    post "/api/v1/lights/brightness" do
+        {:ok, body, _} = read_body(conn)
+
+        {brightness, _} = Integer.parse(body)
+        
+        brightness = cond do
+            brightness > 100 -> 100
+            brightness < 0 -> 0
+            true -> brightness
+        end
+
+        brightness = Kernel.trunc((brightness / 100) * 255)
+
+        bridges = Bridges.get_bridges()
+        Enum.each(bridges, fn(bridge) ->
+            HueWrapper.set_brightness(bridge, brightness)
+        end)
+
+        send_resp(conn, 200, 'OK')
+    end
+
+    post "/api/v1/lights/scene" do
+        {:ok, body, _} = read_body(conn)
+
+        bridges = Bridges.get_bridges()
+        Enum.each(bridges, fn(bridge) ->
+            HueWrapper.set_scene(bridge, body)
+        end)
+
+        send_resp(conn, 200, 'OK')
+    end
 end

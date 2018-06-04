@@ -32,6 +32,25 @@ defmodule HueWrapper do
         connect(ipAddr) |> map_to_ok_err
     end
 
+    def set_scene(bridge, scene_name) do
+        sceneToSet = String.downcase(scene_name)
+        allScenes = Huex.scenes(bridge)
+
+        Enum.each(allScenes, fn {sceneId, sceneObj} -> 
+            if String.downcase(sceneObj["name"]) === sceneToSet do
+                Huex.set_group_state(bridge, 0, %{
+                    "scene": sceneId
+                })
+            end
+        end)
+    end
+
+    def set_brightness(bridge, brightness) do
+        Huex.set_group_state(bridge, 0, %{
+            "bri": brightness
+        })
+    end
+
     def find_and_connect_all do
         find_hue_bridges() |> Enum.map(&(hueconnect &1))
     end
