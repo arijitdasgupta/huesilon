@@ -1,10 +1,7 @@
 defmodule UserConfigFile do
-    require Logger
-
     @users_filename Application.get_env(:huesilon, :userConfigFile)
 
     def read_hue_users_file() do
-        Logger.info "Reading Hue user configuration from #{@users_filename}"
         fileReadOp = File.read(@users_filename)
         case fileReadOp do
             {:ok, content} -> cond do
@@ -29,7 +26,6 @@ defmodule UserConfigFile do
     end
 
     def write_hue_users_file(content) do
-        Logger.info("Writing Hue user configuration to #{@users_filename}")
         {:ok, file} = File.open(@users_filename, [:write])
         IO.write(file, content)
         File.close(file)

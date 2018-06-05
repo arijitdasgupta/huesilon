@@ -1,5 +1,4 @@
 defmodule Boot do
-    require Logger
 
     def bootup do
         Bridges.start()

@@ -1,6 +1,4 @@
 defmodule HueWrapper do
-    require Logger
-
     defp connect(ip, username) do
         Huex.connect(ip, username)
     end
@@ -20,15 +18,11 @@ defmodule HueWrapper do
         Huex.Discovery.discover()
     end
 
-    def hueconnect(ipAddr, username) do
-        Logger.info "Connecting to Hue bridge (#{ipAddr}) with existing username, password"
-        
+    def hueconnect(ipAddr, username) do        
         connect(ipAddr, username) |> map_to_ok_err
     end
 
     defp hueconnect(ipAddr) do
-        Logger.info "Connecting to the Hue bridge at (#{ipAddr})"
-        
         connect(ipAddr) |> map_to_ok_err
     end
 

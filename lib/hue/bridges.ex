@@ -1,15 +1,11 @@
 defmodule Bridges do
-    require Logger
-
     def start do
         {:ok, bridgesAgent} = Agent.start_link(fn -> %{bridges: nil} end, name: __MODULE__)
-        Logger.info "#{__MODULE__} Agent started #{inspect(bridgesAgent)}"
 
         bridgesAgent
     end
 
     def set_bridges(newBridges) do
-        Logger.info "#{__MODULE__} Agent set to #{inspect(newBridges)}"
         Agent.update(__MODULE__, fn(_) -> 
             %{bridges: newBridges}
         end)

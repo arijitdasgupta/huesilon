@@ -1,6 +1,4 @@
 defmodule Huesilon do
-    require Logger
-
     def start_http(port) do
         children = [Plug.Adapters.Cowboy.child_spec(:http, HttpApp, [], port: port)]
         Supervisor.start_link(children, strategy: :one_for_one)
@@ -11,7 +9,6 @@ defmodule Huesilon do
             {:ok, _} -> 
                 start_http(port)
             {:error, reason} -> 
-                Logger.error reason
                 exit(1)
         end
     end
