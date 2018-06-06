@@ -16,6 +16,10 @@ defmodule HueWrapper do
         end
     end
 
+    def find_and_connect_all do
+        find_hue_bridges() |> Enum.map(&(hueconnect &1))
+    end
+
     defp find_hue_bridges do
         Huex.Discovery.discover()
     end
@@ -51,10 +55,6 @@ defmodule HueWrapper do
         })
     end
 
-    def find_and_connect_all do
-        find_hue_bridges() |> Enum.map(&(hueconnect &1))
-    end
-
     defp operate_lights(bridge, funk) do
         funk.(bridge, 0)
     end
@@ -67,17 +67,9 @@ defmodule HueWrapper do
         operate_lights(bridge, &Huex.turn_group_off/2)
     end
 
-    def test_beep(bridges) do
-        Enum.each(bridges, fn(bridge) -> 
-            turn_on_lights(bridge)
-        end)
-
-        Process.sleep(1000)
-
-        Enum.each(bridges, fn(bridge) -> 
-            turn_off_lights(bridge)
-        end)
-
-        :ok
+    def blink(bridge) do
+        Huex.set_group_state(bridge, 0, %{
+            "alert": "select"
+        })
     end
 end

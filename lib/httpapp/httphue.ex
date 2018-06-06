@@ -5,13 +5,27 @@ defmodule HttpHue do
     plug :match
     plug :dispatch
 
+    defp clamp_brightness_value(brightness) do
+        brightness = cond do
+            brightness > 100 -> 100
+            brightness < 0 -> 0
+            true -> brightness
+        end
+
+        Kernel.trunc((brightness / 100) * 255)
+    end
+
+    defp act_on_all_bridges(funk) do
+        bridges = Bridges.get_bridges()
+        Enum.each(bridges, funk)
+    end
+
     def init(options) do
         options
     end
 
     post "/api/v1/lights/on" do
-        bridges = Bridges.get_bridges()
-        Enum.each(bridges, fn(bridge) -> 
+        act_on_all_bridges(fn(bridge) -> 
             HueWrapper.turn_on_lights(bridge)
         end)
 
@@ -19,8 +33,7 @@ defmodule HttpHue do
     end
 
     post "/api/v1/lights/off" do
-        bridges = Bridges.get_bridges()
-        Enum.each(bridges, fn(bridge) -> 
+        act_on_all_bridges(fn(bridge) -> 
             HueWrapper.turn_off_lights(bridge)
         end)
 
@@ -33,17 +46,18 @@ defmodule HttpHue do
 
         {brightness, _} = Integer.parse(body)
         
-        brightness = cond do
-            brightness > 100 -> 100
-            brightness < 0 -> 0
-            true -> brightness
-        end
+        brightness = clamp_brightness_value(brightness)
 
-        brightness = Kernel.trunc((brightness / 100) * 255)
-
-        bridges = Bridges.get_bridges()
-        Enum.each(bridges, fn(bridge) ->
+        act_on_all_bridges(fn(bridge) ->
             HueWrapper.set_brightness(bridge, brightness)
+        end)
+
+        send_resp(conn, 200, 'OK')
+    end
+
+    post "/api/v1/lights/blink" do
+        act_on_all_bridges(fn(bridge) ->
+            HueWrapper.blink(bridge)
         end)
 
         send_resp(conn, 200, 'OK')
@@ -53,8 +67,7 @@ defmodule HttpHue do
     post "/api/v1/lights/scene" do
         {:ok, body, _} = read_body(conn)
 
-        bridges = Bridges.get_bridges()
-        Enum.each(bridges, fn(bridge) ->
+        act_on_all_bridges(fn(bridge) ->
             HueWrapper.set_scene(bridge, body)
         end)
 
