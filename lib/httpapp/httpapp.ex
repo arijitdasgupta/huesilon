@@ -8,6 +8,7 @@ defmodule HttpApp do
       options
     end
 
+    match "/api/v1/alert", to: HttpAlert, init_opts: []
     match "/api/v1/lights/*_", to: HttpHue, init_opts: []
 
     match(_, do: send_resp(conn, 404, "Oops!"))

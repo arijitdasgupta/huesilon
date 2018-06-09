@@ -20,6 +20,12 @@ defmodule HttpHue do
         Enum.each(bridges, funk)
     end
 
+    def blink() do
+        act_on_all_bridges(fn(bridge) ->
+            HueWrapper.blink(bridge)
+        end)
+    end
+
     def init(options) do
         options
     end
@@ -56,9 +62,7 @@ defmodule HttpHue do
     end
 
     post "/api/v1/lights/blink" do
-        act_on_all_bridges(fn(bridge) ->
-            HueWrapper.blink(bridge)
-        end)
+        blink()        
 
         send_resp(conn, 200, 'OK')
     end
