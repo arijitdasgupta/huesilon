@@ -67,6 +67,22 @@ defmodule HttpHue do
         send_resp(conn, 200, 'OK')
     end
 
+    post "/api/v1/lights/loop/start" do
+        act_on_all_bridges(fn(bridge) -> 
+            HueWrapper.start_loop(bridge)
+        end)
+
+        send_resp(conn, 200, 'OK')
+    end
+
+    post "/api/v1/lights/loop/stop" do
+        act_on_all_bridges(fn(bridge) -> 
+            HueWrapper.stop_loop(bridge)
+        end)
+
+        send_resp(conn, 200, 'OK')
+    end
+
     # POST body <scene> 'Savannah Sunset'
     post "/api/v1/lights/scene" do
         {:ok, body, _} = read_body(conn)

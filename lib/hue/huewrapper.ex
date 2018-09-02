@@ -49,14 +49,21 @@ defmodule HueWrapper do
         end)
     end
 
+    defp operate_lights(bridge, funk) do
+        funk.(bridge, 0)
+    end
+
+    defp operate_lights_individually(bridge, funk) do
+        lights = Huex.lights(bridge)
+        Enum.each(lights, fn {light_index, _} -> 
+            funk.(light_index)
+        end)
+    end
+
     def set_brightness(bridge, brightness) do
         Huex.set_group_state(bridge, 0, %{
             "bri": brightness
         })
-    end
-
-    defp operate_lights(bridge, funk) do
-        funk.(bridge, 0)
     end
 
     def turn_on_lights(bridge) do
@@ -70,6 +77,18 @@ defmodule HueWrapper do
     def blink(bridge) do
         Huex.set_group_state(bridge, 0, %{
             "alert": "select"
+        })
+    end
+
+    def start_loop(bridge) do
+        Huex.set_group_state(bridge, 0, %{
+            "effect": "colorloop"
+        })
+    end
+
+    def stop_loop(bridge) do
+        Huex.set_group_state(bridge, 0, %{
+            "effect": "none"
         })
     end
 end
