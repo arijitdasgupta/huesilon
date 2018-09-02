@@ -51,7 +51,7 @@ defmodule HueWrapper do
         funk.(bridge, 0)
     end
 
-    defp operate_on_lights_with_delay(bridge, funk, lights) do
+    defp operate_on_lights_with_delay(bridge, lights, funk) do
         [ light_id | lights ] = lights
         funk.(light_id)
 
@@ -59,16 +59,13 @@ defmodule HueWrapper do
 
         case lights do
             [] -> :ok
-            lights -> operate_on_lights_with_delay(bridge, funk, lights)
+            lights -> operate_on_lights_with_delay(bridge, lights, funk)
         end
     end
 
-    defp operate_lights_individually(bridge, funk) do
+    defp get_all_light_ids(bridge) do
         light_maps = Huex.lights(bridge)
-
-        lights = Enum.map(light_maps, fn {light_id, _} -> light_id end)
-
-        spawn fn -> operate_on_lights_with_delay(bridge, funk, lights) end
+        Enum.map(light_maps, fn {light_id, _} -> light_id end)
     end
 
     def set_scene(bridge, scene_name) do
@@ -96,10 +93,14 @@ defmodule HueWrapper do
     end
 
     def start_loop(bridge) do
-        operate_lights_individually(bridge, fn(light_id) ->
-            Huex.set_state(bridge, light_id, %{
-                "effect": "colorloop"
-            })
+        lights = get_all_light_ids(bridge)
+
+        spawn(fn -> operate_on_lights_with_delay(bridge, lights,
+            fn (light_id) -> 
+                Huex.set_state(bridge, light_id, %{
+                    "effect": "colorloop"
+                })
+            end)
         end)
     end
 
