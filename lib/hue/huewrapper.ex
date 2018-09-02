@@ -36,7 +36,7 @@ defmodule HueWrapper do
         connect(ipAddr) |> map_to_ok_err
     end
 
-    def find_and_set_scene(bridge, scene_name, state_map) do
+    defp find_and_set_scene(bridge, scene_name, state_map) do
         sceneToSet = String.downcase(scene_name)
         allScenes = Huex.scenes(bridge)
 
@@ -47,12 +47,12 @@ defmodule HueWrapper do
         end)
     end
 
-    def set_scene(bridge, scene_name) do
-        find_and_set_scene(bridge, scene_name, %{})
-    end
-
     defp operate_lights(bridge, funk) do
         funk.(bridge, 0)
+    end
+
+    def set_scene(bridge, scene_name) do
+        find_and_set_scene(bridge, scene_name, %{})
     end
 
     def set_brightness(bridge, brightness) do
