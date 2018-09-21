@@ -30,3 +30,4 @@ use Mix.Config
 #     import_config "#{Mix.env}.exs"
 
 config :huesilon, userConfigFile: "usernames.txt"
+config :huesilon, applicationName: "huesilon"

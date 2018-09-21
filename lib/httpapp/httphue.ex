@@ -88,7 +88,6 @@ defmodule HttpHue do
         {:ok, body, _} = read_body(conn)
 
         act_on_all_bridges(fn(bridge) ->
-            HueWrapper.stop_loop(bridge)
             HueWrapper.set_scene(bridge, body)
         end)
 

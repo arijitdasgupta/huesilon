@@ -1,12 +1,14 @@
 defmodule HueWrapper do
     require Logger
 
+    @application_name Application.get_env(:huesilon, :applicationName)
+
     defp connect(ip, username) do
         Huex.connect(ip, username)
     end
 
     defp connect(ip) do
-        Huex.connect(ip) |> Huex.authorize("huesilon#application")
+        Huex.connect(ip) |> Huex.authorize(@application_name)
     end
 
     defp map_to_ok_err(bridge) do
@@ -36,18 +38,25 @@ defmodule HueWrapper do
         connect(ipAddr) |> map_to_ok_err
     end
 
-    defp find_and_set_scene(bridge, scene_name, state_map) do
+    defp find_and_set_scene(bridge, scene_name) do
         sceneToSet = String.downcase(scene_name)
         allScenes = Huex.scenes(bridge)
 
-        Enum.each(allScenes, fn {sceneId, sceneObj} -> 
-            if String.downcase(sceneObj["name"]) === sceneToSet do
-                Huex.set_group_state(bridge, 0, Map.merge(%{"scene": sceneId}, state_map))
-            end
-        end)
+        scenedIds = allScenes |> Enum.filter(
+            fn {_, sceneObj} -> String.downcase(sceneObj["name"]) === sceneToSet end
+        ) |> Enum.map(fn {sceneId, _} -> sceneId end)
+
+        case scenedIds do 
+            [sceneId | _] -> operate_all_lights(bridge, &(Huex.set_group_state(
+                &1,
+                &2,
+                %{"scene": sceneId}
+            )))
+            _ -> nil
+        end
     end
 
-    defp operate_lights(bridge, funk) do
+    defp operate_all_lights(bridge, funk) do
         funk.(bridge, 0)
     end
 
@@ -69,27 +78,28 @@ defmodule HueWrapper do
     end
 
     def set_scene(bridge, scene_name) do
-        find_and_set_scene(bridge, scene_name, %{})
+        stop_loop(bridge)
+        find_and_set_scene(bridge, scene_name)
     end
 
     def set_brightness(bridge, brightness) do
-        Huex.set_group_state(bridge, 0, %{
+        operate_all_lights(bridge, &(Huex.set_group_state(&1, &2, %{
             "bri": brightness
-        })
+        })))
     end
 
     def turn_on_lights(bridge) do
-        operate_lights(bridge, &Huex.turn_group_on/2)
+        operate_all_lights(bridge, &Huex.turn_group_on/2)
     end
 
     def turn_off_lights(bridge) do
-        operate_lights(bridge, &Huex.turn_group_off/2)
+        operate_all_lights(bridge, &Huex.turn_group_off/2)
     end
 
     def blink(bridge) do
-        Huex.set_group_state(bridge, 0, %{
+        operate_all_lights(bridge, &(Huex.set_group_state(&1, &2, %{
             "alert": "select"
-        })
+        })))
     end
 
     def start_loop(bridge) do
@@ -105,8 +115,8 @@ defmodule HueWrapper do
     end
 
     def stop_loop(bridge) do
-        Huex.set_group_state(bridge, 0, %{
+        operate_all_lights(bridge, &(Huex.set_group_state(&1, &2, %{
             "effect": "none"
-        })
+        })))
     end
 end
