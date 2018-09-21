@@ -46,6 +46,7 @@ defmodule HueWrapper do
             fn {_, sceneObj} -> String.downcase(sceneObj["name"]) === sceneToSet end
         ) |> Enum.map(fn {sceneId, _} -> sceneId end)
 
+        # Take the first sceneId and roll with it...
         case scenedIds do 
             [sceneId | _] -> operate_all_lights(bridge, &(Huex.set_group_state(
                 &1,
